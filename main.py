@@ -8,11 +8,6 @@ from PIL import ImageTk,Image
 image = filedialog.askopenfilename()
 image = cv2.imread(image)
 
-
-# image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-# image = Image.fromarray(image)
-# image = ImageTk.PhotoImage(image)
-
 def nothing(x):
     pass
 
@@ -46,7 +41,6 @@ creategui()
 
 setdefaultvalues()
 
-# Initialize to check if BGR min/max value changes
 B_Min = G_Min = R_Min = B_Max = G_Max = R_Max = 0
 
 output = image
@@ -68,16 +62,6 @@ while True:
 
     mask = cv2.inRange(image, lower, upper)
     output = cv2.bitwise_and(image, image, mask=mask)
-
-    #image = Image.fromarray(image)
-    #image = image.convert("RGBA")
-    #datas = image.getdata()
-
-    #for item in datas:
-        #if item[0] == 255 and item[1] == 255 and item[2] == 255:
-            #datas.append((255, 255, 255, 0))
-
-    #image.putdata(datas)
 
 
 
