@@ -26,12 +26,12 @@ def creategui():
 
 
 def setdefaultvalues():
-    # Set default value for MAX HSV trackbars.
+    # Set default value for max BGR trackbars.
     cv2.setTrackbarPos('BMax', 'image', 255)
     cv2.setTrackbarPos('GMax', 'image', 255)
     cv2.setTrackbarPos('RMax', 'image', 255)
 
-    # Set default value for MIN HSV trackbars.
+    # Set default value for min BGR trackbars.
     cv2.setTrackbarPos('BMin', 'image', 0)
     cv2.setTrackbarPos('GMin', 'image', 0)
     cv2.setTrackbarPos('RMin', 'image', 0)
@@ -56,7 +56,7 @@ while True:
     G_Max = cv2.getTrackbarPos('GMax', 'image')
     R_Max = cv2.getTrackbarPos('RMax', 'image')
 
-    # Set minimum and max BGR values to display
+    # Set min and max BGR values to display
     lower = np.array([B_Min, G_Min, R_Min])
     upper = np.array([B_Max, G_Max, R_Max])
 
@@ -71,8 +71,6 @@ while True:
 
 
     if cv2.waitKey(wait_time) & 0xFF == ord('q'):
-
-        print("Image Converted to Greyscale")
         break
 
 cv2.destroyAllWindows()
