@@ -243,7 +243,7 @@ def Measure(master, x, y):
 
 def execute():
     global cvimage
-    cvimage_edited = Tresholder.invertbgimg(cvimage_edit, True)
+    cvimage_edited = Tresholder.invertbgimg(cvimage_edit, False)
     cvimage_edited = Tresholder.removebinoise(cvimage_edited)
     CVRuler.computelength(cvimage_edited)
 
@@ -251,7 +251,7 @@ screeninit(root,x=1400,y=700)
 Measure(root, 0, 600)
 RGBTreshScale(root,x=0, y=0)
 RGBDisplay(root,0,300)
-Image_Spawn(root,600,0)
+Image_Spawn(root,250,0)
 
 
 
