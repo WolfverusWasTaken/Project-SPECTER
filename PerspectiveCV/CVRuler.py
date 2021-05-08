@@ -43,6 +43,7 @@ def computelength(cvimage):
 			continue
 
 		# compute the rotated bounding box of the contour
+		# ==============================================================================================================
 		orig = cvimage.copy()
 		box = cv2.minAreaRect(c)
 		box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
@@ -64,6 +65,7 @@ def computelength(cvimage):
 	(tl, tr, br, bl) = box
 	(tltrX, tltrY) = midpoint(tl, tr)
 	(blbrX, blbrY) = midpoint(bl, br)
+	# ==================================================================================================================
 
 	# compute the midpoint between the top-left and top-right points,
 	# followed by the midpoint between the top-righ and bottom-right
@@ -90,22 +92,21 @@ def computelength(cvimage):
 	# compute it as the ratio of pixels to supplied metric
 	# (in this case, inches)
 	if pixelsPerMetric is None:
-		pixelsPerMetric = dB
+		pixelsPerMetric = dB #WIP
 
 
 	# compute the size of the object
-	dimA = dA
-	dimB = dB
+	dimA = dA #WIP
+	dimB = dB #WIP
 
 	# draw the object sizes on the image
-	cv2.putText(orig, dimB,
-		(int(tltrX - 15), int(tltrY - 10)), cv2.FONT_HERSHEY_SCRIPT_COMPLEX,
-		0.65, (255, 255, 255), 2)
-	cv2.putText(orig, dimA,
-		(int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SCRIPT_COMPLEX,
-		0.65, (255, 255, 255), 2)
+	cv2.putText(orig, "{:.1f}px".format(dimB),
+		(int(tltrX - 15), int(tltrY - 10)), cv2.FONT_HERSHEY_SIMPLEX,
+		0.65, (0, 0, 0), 2)
+	cv2.putText(orig, "{:.1f}px".format(dimA),
+		(int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
+		0.65, (0, 0, 0), 2)
 
 	# show the output image
 	cv2.imshow("Output", orig)
 	cv2.waitKey(0)
-
