@@ -40,13 +40,20 @@ def invertbgimg(cvimage, opt):
 
     return cvimage
 
-def removebinoise(cvimage):
-    cvimage = cv2.fastNlMeansDenoising(cvimage, h = 20,templateWindowSize = 7 ,searchWindowSize = 21)
-
+def removebinoise(cvimage, iter):
+    for i in range(0, iter):
+        cvimage = cv2.fastNlMeansDenoising(cvimage, h = 20,templateWindowSize = 7 ,searchWindowSize = 21)
     return cvimage
 
 def removecolnoise(cvimage):
     cvimage = cv2.fastNlMeansDenoisingColored(cvimage, h = 20,templateWindowSize = 7 ,searchWindowSize = 21)
+    return cvimage
+
+def removespecks(cvimage):
+    element = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+    cvimage = cv2.erode(cvimage, element, iterations=1)
+    cvimage = cv2.dilate(cvimage, element, iterations=1)
+    cvimage = cv2.erode(cvimage, element)
 
     return cvimage
 

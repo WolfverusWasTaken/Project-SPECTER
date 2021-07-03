@@ -12,7 +12,7 @@ import cv2
 def midpoint(ptA, ptB):
 	return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
 
-def computelength(cvimage):
+def computelength(window, cvimage):
 	ap = argparse.ArgumentParser()
 	ap.add_argument("-i", "--image", required=True,
 					help=cvimage)
@@ -54,15 +54,16 @@ def computelength(cvimage):
 		# order, then draw the outline of the rotated bounding
 		# box
 		box = perspective.order_points(box)
+		(tl, tr, br, bl) = box
+
 		cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
 		# loop over the original points and draw them
-		for (x, y) in box:
-			cv2.circle(orig, (int(x), int(y)), 5, (0, 0, 255), -1)
+		'''for (x, y) in box:
+			cv2.circle(orig, (int(x), int(y)), 5, (0, 0, 255), -1)'''
 
 	# unpack the ordered bounding box, then compute the midpoint
 	# between the top-left and top-right coordinates, followed by
 	# the midpoint between bottom-left and bottom-right coordinates
-	(tl, tr, br, bl) = box
 	(tltrX, tltrY) = midpoint(tl, tr)
 	(blbrX, blbrY) = midpoint(bl, br)
 	# ==================================================================================================================
@@ -72,17 +73,14 @@ def computelength(cvimage):
 	(tlblX, tlblY) = midpoint(tl, bl)
 	(trbrX, trbrY) = midpoint(tr, br)
 
-	# draw the midpoints on the image
-	cv2.circle(orig, (int(tltrX), int(tltrY)), 5, (255, 0, 0), -1)
-	cv2.circle(orig, (int(blbrX), int(blbrY)), 5, (255, 0, 0), -1)
-	cv2.circle(orig, (int(tlblX), int(tlblY)), 5, (255, 0, 0), -1)
-	cv2.circle(orig, (int(trbrX), int(trbrY)), 5, (255, 0, 0), -1)
+	# find center of rectangle
+	midA = [tltrX, tltrY]
+	midB = [blbrX, blbrY]
+	(midX, midY) = midpoint(midA, midB)
 
-	# draw lines between the midpoints
-	cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)),
-		(255, 0, 255), 2)
-	cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)),
-		(255, 0, 255), 2)
+	# measure edge to center length
+	l = dist.euclidean((int(midX), int(midY)), (int(midX), int(0)))
+	w = dist.euclidean((int(midX), int(midY)), (int(cvimage.shape[1]), int(midY)))
 
 	# compute the Euclidean distance between the midpoints
 	dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
@@ -94,19 +92,78 @@ def computelength(cvimage):
 	if pixelsPerMetric is None:
 		pixelsPerMetric = dB #WIP
 
-
 	# compute the size of the object
 	dimA = dA #WIP
 	dimB = dB #WIP
 
+	# draw lines between the midpoints
+	cv2.line(orig, (int(tltrX), int(tltrY)), (int(blbrX), int(blbrY)),
+			 (255, 0, 255), 2)
+	cv2.line(orig, (int(tlblX), int(tlblY)), (int(trbrX), int(trbrY)),
+			 (255, 0, 255), 2)
+
+	# draw circle at center
+	cv2.circle(orig, (int(midX), int(midY)), 3, (255, 0, 255), -1)
+
+	'''# length from center to edge
+	cv2.line(orig, (int(midX), int(midY)), (int(midX), int(0)),
+			 (255, 0, 255), 2)
+
+	cv2.line(orig, (int(midX), int(midY)), (int(cvimage.shape[1]), int(midY)),
+			 (255, 0, 255), 2)'''
+
+	dimMax = "L: " + str("{:.1f} units".format(dimB)) + ", W: " + str("{:.1f} units".format(dimA))
 	# draw the object sizes on the image
-	cv2.putText(orig, "{:.1f}px".format(dimB),
-		(int(tltrX - 15), int(tltrY - 10)), cv2.FONT_HERSHEY_SIMPLEX,
-		0.65, (0, 0, 0), 2)
-	cv2.putText(orig, "{:.1f}px".format(dimA),
-		(int(trbrX + 10), int(trbrY)), cv2.FONT_HERSHEY_SIMPLEX,
-		0.65, (0, 0, 0), 2)
+	cv2.putText(orig, dimMax,
+	(int(10), int(cvimage.shape[0] - 10)), cv2.FONT_HERSHEY_SIMPLEX,
+	0.5, (0, 255, 0), 2)
+
+	#measure = "Top Edge: " + str("{:.1f} units".format(l)) + ", Bottom Edge: " + str("{:.1f} units".format(w))
+
+	# draw image measurement
+	'''cv2.putText(orig, measure,
+	(int(10), int(cvimage.shape[0] - 35)), cv2.FONT_HERSHEY_SIMPLEX,
+	0.5, (255, 0, 255), 2)'''
+
+	if window:
+		# show the output image
+		cv2.imshow("[SPECTER] -- Perspective Ruler", orig)
+		cv2.waitKey(0)
+
+	return dimB, dimA
+
+def newcomputelength(cvimage):
+	# load the image, convert it to grayscale, and blur it slightly
+	gray = cv2.cvtColor(cvimage, cv2.COLOR_BGR2GRAY)
+	gray = cv2.GaussianBlur(gray, (7, 7), 0)
+
+	# perform edge detection, then perform a dilation + erosion to
+	# close gaps in between object edges
+	edged = cv2.Canny(gray, 50, 100)
+	edged = cv2.dilate(edged, None, iterations=1)
+	edged = cv2.erode(edged, None, iterations=1)
+
+	# find contours in the edge map
+	cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
+		cv2.CHAIN_APPROX_SIMPLE)
+	cnts = imutils.grab_contours(cnts)
+
+	# sort the contours from left-to-right and initialize the
+	# 'pixels per metric' calibration variable
+	(cnts, _) = contours.sort_contours(cnts)
+
+	for c in cnts:
+		if cv2.contourArea(c) < 100:
+			continue
+
+		orig = cvimage.copy()
+		box = cv2.minAreaRect(c)
+		box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
+		box = np.array(box, dtype="int")
+
+		'''box = perspective.order_points(box)
+		cv2.drawContours(orig, cnts, -1, (0, 255, 0), 2)'''
 
 	# show the output image
-	cv2.imshow("Output", orig)
+	cv2.imshow("[SPECTER] -- Perspective Ruler", orig)
 	cv2.waitKey(0)
