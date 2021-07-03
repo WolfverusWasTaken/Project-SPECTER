@@ -39,7 +39,7 @@ File_Directory = StringVar()
 
 #Screen Initializer. Creates screen.
 def screeninit(master,x, y):
-    master.title("[SPECTER] - Image Renderer")
+    master.title("[Gluefinder]")
     master.resizable(FALSE, FALSE)
     master.geometry(str(x) + "x" + str(y))
     # root.attributes("-fullscreen", 1)
@@ -63,6 +63,14 @@ def Image_Spawn(master,x,y):
     global panel
     panel = Label(master=master, image=tkimage)
     panel.place(x=x, y=y)
+
+#WIP TO BE DECIDED
+def Logo_Spawn(master, x, y):
+    global logo
+    cvimage = cv2.imread('Logo.jpg')
+    photo = Tresholder.CV2TkConvert(root, cvimage)
+    logo = Label(master=master, image=photo)
+    logo.place(x=x, y=y)
 
 #RGB Treshold editor and changer.
 def RGBTreshScale(master,x,y):
@@ -181,9 +189,9 @@ def RGBTreshScale(master,x,y):
     canvas.place(x=x, y=y)#0,0
 
     BlueMin.set(88)
-    GreenMin.set(29)
+    GreenMin.set(0)
     BlueMax.set(145)
-    GreenMax.set(178)
+    GreenMax.set(int(-(((53 - 255) * 255) / 255) + 0))
 
 def RGBDisplay(master,x,y):
     global RedTreshold
@@ -421,11 +429,11 @@ def executefolder():
 #Code Starts here:
 #====================================================
 screeninit(root,x=1400,y=700)
-ImgFolderSelect_Spawn(root, 1318, 645)
-ExcelFileSelect_Spawn(root, 1318, 590)
-Measure_Spawn(root, 0, 400)
+ImgFolderSelect_Spawn(root, x = 1318, y = 645)
+ExcelFileSelect_Spawn(root, x = 1318, y = 590)
+Measure_Spawn(root, x = 0, y = 400)
 RGBTreshScale(root,x=0, y=0)
-RGBDisplay(root,0,300)
+RGBDisplay(root, x = 0, y = 300)
 DirDisplay(root, 974, 675)
 FileDisplay(root, 974, 620)
 Image_Spawn(root,250,0)
