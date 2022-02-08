@@ -16,7 +16,7 @@ This is a software that allows the detection on infrared/hyperspectral images vi
 
 It is still work in progress and I plan on improving it. A newer and faster version of this software is currently being worked on with C# or Java.
 
-
+![Slide1](https://user-images.githubusercontent.com/75195899/153037399-ab670a11-f209-43ad-a224-e802be0ed3b5.JPG)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
